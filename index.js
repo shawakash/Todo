@@ -48,7 +48,7 @@ const port = 3000;
 const cors = require("cors");
 
 app.use(bodyParser.json());
-// app.use(cors());
+app.use(cors());
 // to allow fetch request from any url or else only same url as of backend 
 // would be able to fetch the request
 
