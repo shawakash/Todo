@@ -45,8 +45,12 @@ const bodyParser = require('body-parser');
 
 const app = express();
 const port = 3010;
+const cors = require("cors");
 
 app.use(bodyParser.json());
+// app.use(cors());
+// to allow fetch request from any url or else only same url as of backend 
+// would be able to fetch the request
 
 
 // const readFile = () => {
