@@ -131,7 +131,7 @@ app.post('/todos', (req, res) => {
     todos[newTodo.id] = newTodo;
     fs.writeFile("todos.json", JSON.stringify(todos), (err) => {
       if (err) throw err;
-      res.status(201).json(newTodo);
+      return res.status(201).json(newTodo);
     });
   });
 });
@@ -189,4 +189,3 @@ app.listen(port, () => {
   console.log(`Server is running on port: ${port}`);
 })
 
-module.exports = app;
