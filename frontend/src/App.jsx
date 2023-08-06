@@ -32,13 +32,47 @@ const useTodo = () => {
   return todos;
 }
 
+// ...
+
+const webSocket = () => {
+  const [todos, setTodos] = useState([]); // Rename 'message' state to 'todos'
+
+  useEffect(() => {
+    const ws = new WebSocket('ws://localhost:8084');
+
+    ws.onopen = () => {
+      console.log("Connection Established");
+    }
+
+    ws.onopen = () => {
+      ws.send('request-file');
+    }
+
+    ws.onmessage = async (event) => {
+      let message = await event.data;
+      message = JSON.parse(message);
+      const todo = Object.keys(message).map(to => message[to]);
+      setTodos(todo); // Update 'todos' state with the received todo data
+    }
+
+    ws.onclose = () => {
+      console.log("Connection closed")
+    }
+  }, []);
+
+  return todos; // Return 'todos' state instead of 'message'
+}
+
+// ...
+
 
 function App() {
 
   // Either call the custom hook which fetches todo every one second so no need to update state in component and be happpy
   // Or call the inBuilt hooks and uodate the useState locally
   // UseEffect is run twice due to many reason but mainly due to react strict mode
-
+  // const todos = webSocket();
+  // console.log(todos);
   const [todos, setTodos] = useState([]);
   const [disabled, setDisable] = useState(0);
   useEffect(() => {
@@ -65,7 +99,7 @@ function App() {
         "Content-type": "application/json"
       },
       body: JSON.stringify({ title, description })
-    }).then(response => response.json() )
+    }).then(response => response.json())
       .then(data => {
         setTodos((pretodos) => [...pretodos, data]);
         titleRef.current.value = '';
@@ -110,7 +144,7 @@ function App() {
           </div>
         </div>
         <div className="todos flex gap-5 flex-wrap mt-7 items-end justify-center">
-          {todos.map((todo) => {
+          {todos && todos.map((todo) => {
             return <Todo key={todo.id} todo={todo} delete={handleDelete} />
           })}
         </div>
