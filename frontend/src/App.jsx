@@ -34,19 +34,18 @@ const useTodo = () => {
 
 
 function App() {
-  // const [todos, setTodos] = useState([]);
-  const todos = useTodo();
+  const [todos, setTodos] = useState([]);
   const [disabled, setDisable] = useState(0);
-  // useEffect(() => {
-  //   fetch(`${baseUrl}/todos`, {
-  //     method: "GET",
-  //     headers: {
-  //       "Content-type": "application/json"
-  //     }
-  //   }).then(response => response.json())
-  //     .then(data => setTodos(Object.keys(data).map(obj => data[obj])))
-  //     .catch(err => console.error(err));
-  // }, [])
+  useEffect(() => {
+    fetch(`${baseUrl}/todos`, {
+      method: "GET",
+      headers: {
+        "Content-type": "application/json"
+      }
+    }).then(response => response.json())
+      .then(data => setTodos(Object.keys(data).map(obj => data[obj])))
+      .catch(err => console.error(err));
+  }, [])
   const titleRef = useRef(null);
   const desRef = useRef(null);
 
@@ -63,7 +62,9 @@ function App() {
       body: JSON.stringify({ title, description })
     }).then(response => response.json() )
       .then(data => {
-        // setTodos((pretodos) => [...pretodos, data]);
+        setTodos((pretodos) => [...pretodos, data]);
+        titleRef.current.value = '';
+        desRef.current.value = '';
         setDisable(0);
       })
   }
@@ -82,10 +83,10 @@ function App() {
         return;
       }
       if(response.status == 200) {
-        // setTodos((preTodos) => {
-        //   const update = preTodos.filter(pretodo => pretodo.id != id);
-        //   return update;
-        // })
+        setTodos((preTodos) => {
+          const update = preTodos.filter(pretodo => pretodo.id != id);
+          return update;
+        })
         alert("Delete Successfully");
         setDisable(0);
         return;
