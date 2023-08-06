@@ -34,6 +34,11 @@ const useTodo = () => {
 
 
 function App() {
+
+  // Either call the custom hook which fetches todo every one second so no need to update state in component and be happpy
+  // Or call the inBuilt hooks and uodate the useState locally
+  // UseEffect is run twice due to many reason but mainly due to react strict mode
+
   const [todos, setTodos] = useState([]);
   const [disabled, setDisable] = useState(0);
   useEffect(() => {
