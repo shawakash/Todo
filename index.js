@@ -190,9 +190,17 @@ app.use((req, res, next) => {
 });
 
 io.on('connection', (socket) => {
-  console.log("Socket Connected")
+  console.log("Socket Connected");
+
+  socket.on('getTodos', (_) => {
+    fs.readFile("todos.json", "utf-8", (err, data) => {
+      if (err) throw err;
+      const todos = JSON.parse(data);
+      io.emit('todos', todos);
+    })
+  })
+
   socket.on('createTodo', (todo) => {
-    console.log("Socket Connected");
     // add todo to db
     const newTodo = {
       id: Math.floor(Math.random() * 1000000), // unique random id
@@ -208,12 +216,24 @@ io.on('connection', (socket) => {
       todos[newTodo.id] = newTodo;
       fs.writeFile("todos.json", JSON.stringify(todos), (err) => {
         if (err) throw err;
-        io.emit('todoCreated', {todo, status: 200});
+        io.emit('todoCreated', {todo: newTodo, status: 200});
       });
+    });
+
+    socket.on('deleteTodo', (todoId) => {
+      console.log(todoId)
+      deleteTodoFromJson(todoId);
+      io.emit('todoDeleted', todoId);
     });
   })
 
 })
+
+function deleteTodoFromJson(todoId) {
+  const todos = JSON.parse(fs.readFileSync("todos.json", 'utf8'));
+  const updatedTodos = todos.filter((todo) => todo.id !== todoId);
+  fs.writeFileSync("todos.json", JSON.stringify(updatedTodos, null, 2), 'utf8');
+}
 
 server.listen(port, () => {
   console.log(`Server is running on port: ${port}`);

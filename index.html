@@ -157,15 +157,18 @@
             const form = document.getElementById('postForm');
             const baseUrl = "http://localhost:3000/todos";
 
-            fetch(baseUrl, {
-                method: "GET",
-            }).then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json()
-            }).then(data => {
-                todos = data;
+            // fetch(baseUrl, {
+                // method: "GET",
+            // }).then(response => {
+            //     if (!response.ok) {
+            //         throw new Error('Network response was not ok');
+            //     }
+            //     return response.json()
+            // }).then(data => {
+                
+            // });
+
+            const createTodos = todos => {
                 const todoContainner = document.querySelector('.todo-container');
 
                 if (Object.keys(todos).length != 0) {
@@ -221,7 +224,13 @@
                         })
                     })
                 }
-            });
+            }
+
+            socket.emit("getTodos", {});
+
+            socket.on('todos', (data) => {
+                createTodos(data);
+            })
 
 
             form.addEventListener('submit', function (event) {
@@ -317,7 +326,7 @@
                 // })
 
                 // Clear the input fields
-                
+
                 socket.emit('createTodo', reqBody);
 
                 titleInput.value = '';
@@ -369,11 +378,21 @@
                                 }
                             }
                         })
+                        // console.log(id)
+                        // socket.emit('deleteTodo', id);
+                        // console.log(id)
                     }
                 })
 
-                
+
             });
+
+            // socket.on('todoDeleted', (todoId) => {
+            //     const todoDiv = document.querySelector(`[data-todo-id="${todoId}"]`);
+            //     if (todoDiv) {
+            //         todoDiv.remove();
+            //     }
+            // });
         });
     </script>
 </body>
