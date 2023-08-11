@@ -44,6 +44,10 @@ const fs = require("fs");
 const bodyParser = require('body-parser');
 
 const app = express();
+const http = require("http");
+const server = http.createServer(app);
+const {Server} = require("socket.io");
+const io = new Server(server);
 const port = 3000;
 const cors = require("cors");
 
@@ -185,7 +189,33 @@ app.use((req, res, next) => {
   res.status(404).send();
 });
 
-app.listen(port, () => {
+io.on('connection', (socket) => {
+  console.log("Socket Connected")
+  socket.on('createTodo', (todo) => {
+    console.log("Socket Connected");
+    // add todo to db
+    const newTodo = {
+      id: Math.floor(Math.random() * 1000000), // unique random id
+      title: todo.title,
+      description: todo.description
+    };
+    fs.readFile("todos.json", "utf8", (err, data) => {
+      if (err) throw err;
+      let todos = {};
+      if(data != ''){
+        todos = JSON.parse(data);
+      } 
+      todos[newTodo.id] = newTodo;
+      fs.writeFile("todos.json", JSON.stringify(todos), (err) => {
+        if (err) throw err;
+        io.emit('todoCreated', {todo, status: 200});
+      });
+    });
+  })
+
+})
+
+server.listen(port, () => {
   console.log(`Server is running on port: ${port}`);
 })
 

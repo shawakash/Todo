@@ -148,7 +148,10 @@
     </div>
     <div class="todo-container">
     </div>
+    <script src="/socket.io/socket.io.js"></script>
+
     <script>
+        var socket = io();
         let todos = {}
         document.addEventListener('DOMContentLoaded', function () {
             const form = document.getElementById('postForm');
@@ -190,35 +193,35 @@
                         todo.setAttribute('id', todos[i].id);
                         todoContainner.appendChild(todo);
 
-                        
-                        
+
+
                     }
                     const todosEle = document.querySelectorAll(".todo");
                     todosEle.forEach(todo => {
                         todo.addEventListener("click", () => {
                             const id = todo.id;
                             const ans = prompt("Do you want to delete this? 'y' or 'n'");
-                            if(ans.toLowerCase() == 'y') {
+                            if (ans.toLowerCase() == 'y') {
                                 fetch(`${baseUrl}/${id}`, {
-                                    method: "delete", 
-                                    headers: {"Content-type": "application/json"}}
+                                    method: "delete",
+                                    headers: { "Content-type": "application/json" }
+                                }
                                 ).then(response => {
-                                    if(response.ok) {
+                                    if (response.ok) {
                                         const todosEle = document.querySelectorAll(".todo");
                                         const todos = document.querySelector(".todo-container");
-                                        for(let i of todosEle) {
-                                            if(id == i.id) {
+                                        for (let i of todosEle) {
+                                            if (id == i.id) {
                                                 todos.removeChild(i)
                                             }
                                         }
                                     }
-                            })
+                                })
                             }
                         })
                     })
                 }
             });
-
 
 
             form.addEventListener('submit', function (event) {
@@ -247,74 +250,129 @@
                     body: JSON.stringify(reqBody)
                 }
 
-                fetch(baseUrl, reqObj)
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok');
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        // Handle the response from the server, if needed
-                        console.log('Server Response:', data);
-                        const todoContainner = document.querySelector('.todo-container')
-                        const title = document.createElement('div');
-                        // Add a class to the div
-                        title.classList.add('title-bar');
-                        const h1 = document.createElement('h1');
+                // fetch(baseUrl, reqObj)
+                //     .then(response => {
+                //         if (!response.ok) {
+                //             throw new Error('Network response was not ok');
+                //         }
+                //         return response.json();
+                //     })
+                //     .then(data => {
+                //         // Handle the response from the server, if needed
+                //         console.log('Server Response:', data);
+                //         const todoContainner = document.querySelector('.todo-container')
+                //         const title = document.createElement('div');
+                //         // Add a class to the div
+                //         title.classList.add('title-bar');
+                //         const h1 = document.createElement('h1');
 
-                        // You can also set other attributes and content for the div, if needed
-                        h1.textContent = data.title;
-                        title.appendChild(h1);
+                //         // You can also set other attributes and content for the div, if needed
+                //         h1.textContent = data.title;
+                //         title.appendChild(h1);
 
-                        const description = document.createElement('div');
-                        description.classList.add("description");
-                        description.textContent = data.description;
+                //         const description = document.createElement('div');
+                //         description.classList.add("description");
+                //         description.textContent = data.description;
 
-                        const todo = document.createElement('div');
-                        todo.classList.add("todo");
-                        todo.classList.add("container");
+                //         const todo = document.createElement('div');
+                //         todo.classList.add("todo");
+                //         todo.classList.add("container");
 
-                        // Append the new div to the body or any other parent element
-                        todo.appendChild(title);
-                        todo.appendChild(description);
-                        todo.setAttribute('id', data.id);
-                        todoContainner.appendChild(todo)
-                        todo.addEventListener("click", () => {
-                            const id = todo.id;
-                            const ans = prompt("Do you want to delete this? 'y' or 'n'");
-                            if(ans.toLowerCase() == 'y') {
-                                fetch(`${baseUrl}/${id}`, {
-                                    method: "delete", 
-                                    headers: {"Content-type": "application/json"}}
-                                ).then(response => {
-                                    if(response.ok) {
-                                        const todosEle = document.querySelectorAll(".todo");
-                                        const todos = document.querySelector(".todo-container");
-                                        for(let i of todosEle) {
-                                            if(id == i.id) {
-                                                todos.removeChild(i)
-                                            }
-                                        }
-                                    }
-                            })
-                            }
-                        })
+                //         // Append the new div to the body or any other parent element
+                //         todo.appendChild(title);
+                //         todo.appendChild(description);
+                //         todo.setAttribute('id', data.id);
+                //         todoContainner.appendChild(todo)
+                //         todo.addEventListener("click", () => {
+                //             const id = todo.id;
+                //             const ans = prompt("Do you want to delete this? 'y' or 'n'");
+                //             if (ans.toLowerCase() == 'y') {
+                //                 fetch(`${baseUrl}/${id}`, {
+                //                     method: "delete",
+                //                     headers: { "Content-type": "application/json" }
+                //                 }
+                //                 ).then(response => {
+                //                     if (response.ok) {
+                //                         const todosEle = document.querySelectorAll(".todo");
+                //                         const todos = document.querySelector(".todo-container");
+                //                         for (let i of todosEle) {
+                //                             if (id == i.id) {
+                //                                 todos.removeChild(i)
+                //                             }
+                //                         }
+                //                     }
+                //                 })
+                //             }
+                //         })
 
-                    })
-                    .catch(error => {
-                        // Handle any errors that occurred during the fetch
-                        console.error('Error:', error);
-                    });
+                //     })
+                //     .catch(error => {
+                //         // Handle any errors that occurred during the fetch
+                //         console.error('Error:', error);
+                //     });
 
-                const todos = document.querySelectorAll(".todo");
-                todos.forEach(todo => {
+                // const todos = document.querySelectorAll(".todo");
+                // todos.forEach(todo => {
 
-                })
+                // })
 
                 // Clear the input fields
+                
+                socket.emit('createTodo', reqBody);
+
                 titleInput.value = '';
                 descriptionInput.value = '';
+            })
+
+            socket.on('todoCreated', (res) => {
+                console.log('Socket Response:', res);
+                const data = res.todo
+                const todoContainner = document.querySelector('.todo-container')
+                const title = document.createElement('div');
+                // Add a class to the div
+                title.classList.add('title-bar');
+                const h1 = document.createElement('h1');
+
+                // You can also set other attributes and content for the div, if needed
+                h1.textContent = data.title;
+                title.appendChild(h1);
+
+                const description = document.createElement('div');
+                description.classList.add("description");
+                description.textContent = data.description;
+
+                const todo = document.createElement('div');
+                todo.classList.add("todo");
+                todo.classList.add("container");
+
+                // Append the new div to the body or any other parent element
+                todo.appendChild(title);
+                todo.appendChild(description);
+                todo.setAttribute('id', data.id);
+                todoContainner.appendChild(todo)
+                todo.addEventListener("click", () => {
+                    const id = todo.id;
+                    const ans = prompt("Do you want to delete this? 'y' or 'n'");
+                    if (ans.toLowerCase() == 'y') {
+                        fetch(`${baseUrl}/${id}`, {
+                            method: "delete",
+                            headers: { "Content-type": "application/json" }
+                        }
+                        ).then(response => {
+                            if (response.ok) {
+                                const todosEle = document.querySelectorAll(".todo");
+                                const todos = document.querySelector(".todo-container");
+                                for (let i of todosEle) {
+                                    if (id == i.id) {
+                                        todos.removeChild(i)
+                                    }
+                                }
+                            }
+                        })
+                    }
+                })
+
+                
             });
         });
     </script>
