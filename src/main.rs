@@ -11,6 +11,13 @@ async fn slash() -> impl Responder  {
         })
 } 
 
+async fn create_todo() -> impl Responder {
+    HttpResponse::Ok()
+        .json(Status {
+            status: "Ok".to_string()
+        })
+}
+
 #[actix_web::main]
 async fn main() -> io::Result<()> {
 
@@ -19,6 +26,7 @@ async fn main() -> io::Result<()> {
     HttpServer::new(|| {
         App::new()
             .route("/", web::get().to(slash))
+            .route("/createTodo", web::get().to(create_todo))
     })
     .bind("127.0.0.1:3000")?
     .run()
